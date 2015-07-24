@@ -18,7 +18,7 @@
 Summary:        Protocol Buffers - Google's data interchange format
 Name:           %{?scl_prefix}protobuf
 Version:        2.4.1
-Release:        13%{?dist}
+Release:        14%{?dist}
 License:        BSD
 Group:          Development/Libraries
 Source:         http://protobuf.googlecode.com/files/%{pkg_name}-%{version}.tar.bz2
@@ -356,6 +356,9 @@ install -p -m 0644 %{SOURCE2} $RPM_BUILD_ROOT%{emacs_startdir}
 %endif
 
 %changelog
+* Fri Jul 24 2015 Joshua Hoblitt <josh@hoblitt.com> 2.4.1-14
+- add source tarball (josh@hoblitt.com)
+
 * Fri Jul 24 2015 Joshua Hoblitt <josh@hoblitt.com> 2.4.1-13
 - new package built with tito
 
