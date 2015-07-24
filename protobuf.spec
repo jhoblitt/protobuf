@@ -18,7 +18,7 @@
 Summary:        Protocol Buffers - Google's data interchange format
 Name:           %{?scl_prefix}protobuf
 Version:        2.4.1
-Release:        17%{?dist}
+Release:        18%{?dist}
 License:        BSD
 Group:          Development/Libraries
 Source:         http://protobuf.googlecode.com/files/%{pkg_name}-%{version}.tar.bz2
@@ -71,7 +71,7 @@ This package contains Protocol Buffers compiler for all languages and
 C++ headers and libraries
 
 %package static
-Summary: Static development files for %{pkg_name}
+Summary: Static development files for %{?scl_prefix}%{pkg_name}
 Group: Development/Libraries
 Requires: %{?scl_prefix}%{pkg_name} = %{version}-%{release}
 
@@ -103,7 +103,7 @@ which only depends libprotobuf-lite, which is much smaller than libprotobuf but
 lacks descriptors, reflection, and some other features.
 
 %package lite-static
-Summary: Static development files for %{pkg_name}-lite
+Summary: Static development files for %{?scl_prefix}%{pkg_name}-lite
 Group: Development/Libraries
 Requires: %{?scl_prefix}%{pkg_name}-devel = %{version}-%{release}
 
@@ -150,12 +150,12 @@ descriptions in the Emacs editor.
 %package emacs-el
 Summary: Elisp source files for Google protobuf Emacs mode
 Group: Applications/Editors
-Requires: protobuf-emacs = %{version}
+Requires: %{?scl_prefix}protobuf-emacs = %{version}
 
 %description emacs-el
-This package contains the elisp source files for %{pkgname}-emacs
+This package contains the elisp source files for %{?scl_prefix}%{pkg_name}-emacs
 under GNU Emacs. You do not need to install this package to use
-%{pkgname}-emacs.
+%{?scl_prefix}%{pkg_name}-emacs.
 
 
 %if %{with java}
@@ -175,20 +175,20 @@ BuildRequires:    maven-surefire-plugin
 BuildRequires:    maven-antrun-plugin
 Requires:         java
 Requires:         jpackage-utils
-Conflicts:        %{pkg_name}-compiler > %{version}
-Conflicts:        %{pkg_name}-compiler < %{version}
+Conflicts:        %{?scl_prefix}%{pkg_name}-compiler > %{version}
+Conflicts:        %{?scl_prefix}%{pkg_name}-compiler < %{version}
 
 %description java
 This package contains Java Protocol Buffers runtime library.
 
 %package javadoc
-Summary: Javadocs for %{pkg_name}-java
+Summary: Javadocs for %{?scl_prefix}%{pkg_name}-java
 Group:   Documentation
 Requires: jpackage-utils
-Requires: %{pkg_name}-java = %{version}-%{release}
+Requires: %{?scl_prefix}%{pkg_name}-java = %{version}-%{release}
 
 %description javadoc
-This package contains the API documentation for %{pkg_name}-java.
+This package contains the API documentation for %{?scl_prefix}%{pkg_name}-java.
 
 %endif
 
@@ -366,6 +366,9 @@ install -p -m 0644 %{SOURCE2} $RPM_BUILD_ROOT%{emacs_startdir}
 %endif
 
 %changelog
+* Fri Jul 24 2015 Joshua Hoblitt <josh@hoblitt.com> 2.4.1-18
+- 
+
 * Fri Jul 24 2015 Joshua Hoblitt <josh@hoblitt.com> 2.4.1-17
 - 
 
