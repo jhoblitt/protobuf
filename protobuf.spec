@@ -6,8 +6,8 @@
 
 # Build -python subpackage
 %bcond_without python
-# Build -java subpackage
-%bcond_without java
+# DOn't Build -java subpackage
+%bcond_with java
 # Don't require gtest
 %bcond_with gtest
 
@@ -18,14 +18,14 @@
 Summary:        Protocol Buffers - Google's data interchange format
 Name:           %{?scl_prefix}protobuf
 Version:        2.4.1
-Release:        14%{?dist}
+Release:        15%{?dist}
 License:        BSD
 Group:          Development/Libraries
 Source:         http://protobuf.googlecode.com/files/%{pkg_name}-%{version}.tar.bz2
 Source1:        ftdetect-proto.vim
 Source2:        protobuf-init.el
 Patch1:         protobuf-2.3.0-fedora-gtest.patch
-Patch2:    	    protobuf-2.4.1-java-fixes.patch
+Patch2:         protobuf-2.4.1-java-fixes.patch
 URL:            http://code.google.com/p/protobuf/
 BuildRequires:  automake autoconf libtool pkgconfig zlib-devel
 BuildRequires:  emacs
@@ -61,7 +61,7 @@ Summary: Protocol Buffers C++ headers and libraries
 Group: Development/Libraries
 Requires: %{?scl_prefix}%{pkg_name} = %{version}-%{release}
 Requires: %{?scl_prefix}%{pkg_name}-compiler = %{version}-%{release}
-Requires: %{?scl_prefix}pkgconfig
+Requires: pkgconfig
 
 %description devel
 This package contains Protocol Buffers compiler for all languages and
@@ -356,6 +356,9 @@ install -p -m 0644 %{SOURCE2} $RPM_BUILD_ROOT%{emacs_startdir}
 %endif
 
 %changelog
+* Fri Jul 24 2015 Joshua Hoblitt <josh@hoblitt.com> 2.4.1-15
+- 
+
 * Fri Jul 24 2015 Joshua Hoblitt <josh@hoblitt.com> 2.4.1-14
 - add source tarball (josh@hoblitt.com)
 
@@ -416,7 +419,7 @@ install -p -m 0644 %{SOURCE2} $RPM_BUILD_ROOT%{emacs_startdir}
 - Rebuilt for https://fedoraproject.org/wiki/Features/Python_2.7/MassRebuild
 
 * Thu Jul 15 2010 James Laska <jlaska@redhat.com> - 2.3.0-3
-- Correct use of %bcond macros
+- Correct use of bcond macros
 
 * Wed Jul 14 2010 James Laska <jlaska@redhat.com> - 2.3.0-2
 - Enable python and java sub-packages
