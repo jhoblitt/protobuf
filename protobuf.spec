@@ -18,7 +18,7 @@
 Summary:        Protocol Buffers - Google's data interchange format
 Name:           %{?scl_prefix}protobuf
 Version:        2.4.1
-Release:        16%{?dist}
+Release:        17%{?dist}
 License:        BSD
 Group:          Development/Libraries
 Source:         http://protobuf.googlecode.com/files/%{pkg_name}-%{version}.tar.bz2
@@ -247,7 +247,10 @@ find %{buildroot} -type f -name "*.la" -exec rm -f {} \;
 %if %{with python}
 pushd python
 %{?scl:scl enable %{scl} - << \EOF}
-%{__python} setup.py install --root=%{buildroot} --single-version-externally-managed --record=INSTALLED_FILES --optimize=1
+%{__python} setup.py install --root=%{buildroot} --single-version-externally-managed --record=INSTALLED_FILES --optimize=1 \
+    --install-purelib %{python_sitelib} \
+    --install-scripts=%{_bindir} \
+    --install-data=%{_datadir}
 %{?scl:EOF}
 popd
 %endif
@@ -363,6 +366,9 @@ install -p -m 0644 %{SOURCE2} $RPM_BUILD_ROOT%{emacs_startdir}
 %endif
 
 %changelog
+* Fri Jul 24 2015 Joshua Hoblitt <josh@hoblitt.com> 2.4.1-17
+- 
+
 * Fri Jul 24 2015 Joshua Hoblitt <josh@hoblitt.com> 2.4.1-16
 - 
 
