@@ -1,3 +1,9 @@
+%global scl lsst-stack1
+
+%{?scl:%global _scl_prefix /opt/lsst}
+%{?scl:%scl_package protobuf}
+%{!?scl:%global pkg_name %{name}}
+
 # Build -python subpackage
 %bcond_without python
 # Build -java subpackage
@@ -5,21 +11,17 @@
 # Don't require gtest
 %bcond_with gtest
 
-%if %{with python}
-%define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")
-%endif
-
 %global emacs_version %(pkg-config emacs --modversion)
 %global emacs_lispdir %(pkg-config emacs --variable sitepkglispdir)
 %global emacs_startdir %(pkg-config emacs --variable sitestartdir)
 
 Summary:        Protocol Buffers - Google's data interchange format
-Name:           protobuf
+Name:           %{?scl_prefix}protobuf
 Version:        2.4.1
-Release:        12%{?dist}
+Release:        13%{?dist}
 License:        BSD
 Group:          Development/Libraries
-Source:         http://protobuf.googlecode.com/files/%{name}-%{version}.tar.bz2
+Source:         http://protobuf.googlecode.com/files/%{pkg_name}-%{version}.tar.bz2
 Source1:        ftdetect-proto.vim
 Source2:        protobuf-init.el
 Patch1:         protobuf-2.3.0-fedora-gtest.patch
@@ -48,7 +50,7 @@ breaking deployed programs that are compiled against the "old" format.
 %package compiler
 Summary: Protocol Buffers compiler
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
+Requires: %{?scl_prefix}%{pkg_name} = %{version}-%{release}
 
 %description compiler
 This package contains Protocol Buffers compiler for all programming
@@ -57,18 +59,18 @@ languages
 %package devel
 Summary: Protocol Buffers C++ headers and libraries
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
-Requires: %{name}-compiler = %{version}-%{release}
-Requires: pkgconfig
+Requires: %{?scl_prefix}%{pkg_name} = %{version}-%{release}
+Requires: %{?scl_prefix}%{pkg_name}-compiler = %{version}-%{release}
+Requires: %{?scl_prefix}pkgconfig
 
 %description devel
 This package contains Protocol Buffers compiler for all languages and
 C++ headers and libraries
 
 %package static
-Summary: Static development files for %{name}
+Summary: Static development files for %{pkg_name}
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
+Requires: %{?scl_prefix}%{pkg_name} = %{version}-%{release}
 
 %description static
 Static libraries for Protocol Buffers
@@ -86,8 +88,8 @@ lacks descriptors, reflection, and some other features.
 
 %package lite-devel
 Summary: Protocol Buffers LITE_RUNTIME development libraries
-Requires: %{name}-devel = %{version}-%{release}
-Requires: %{name}-lite = %{version}-%{release}
+Requires: %{?scl_prefix}%{pkg_name}-devel = %{version}-%{release}
+Requires: %{?scl_prefix}%{pkg_name}-lite = %{version}-%{release}
 
 %description lite-devel
 This package contains development libraries built with
@@ -98,9 +100,9 @@ which only depends libprotobuf-lite, which is much smaller than libprotobuf but
 lacks descriptors, reflection, and some other features.
 
 %package lite-static
-Summary: Static development files for %{name}-lite
+Summary: Static development files for %{pkg_name}-lite
 Group: Development/Libraries
-Requires: %{name}-devel = %{version}-%{release}
+Requires: %{?scl_prefix}%{pkg_name}-devel = %{version}-%{release}
 
 %description lite-static
 This package contains static development libraries built with
@@ -111,13 +113,14 @@ which only depends libprotobuf-lite, which is much smaller than libprotobuf but
 lacks descriptors, reflection, and some other features.
 
 %if %{with python}
+
 %package python
 Summary: Python bindings for Google Protocol Buffers
 Group: Development/Languages
-BuildRequires: python-devel
-BuildRequires: python-setuptools-devel
-Conflicts: %{name}-compiler > %{version}
-Conflicts: %{name}-compiler < %{version}
+BuildRequires: %{?scl:python27-}python-devel
+BuildRequires: %{?scl:python27-}python-setuptools-devel
+Conflicts: %{?scl_prefix}%{pkg_name}-compiler > %{version}
+Conflicts: %{?scl_prefix}%{pkg_name}-compiler < %{version}
 
 %description python
 This package contains Python libraries for Google Protocol Buffers
@@ -153,6 +156,7 @@ under GNU Emacs. You do not need to install this package to use
 
 
 %if %{with java}
+
 %package java
 Summary: Java Protocol Buffers runtime library
 Group:   Development/Languages
@@ -168,25 +172,25 @@ BuildRequires:    maven-surefire-plugin
 BuildRequires:    maven-antrun-plugin
 Requires:         java
 Requires:         jpackage-utils
-Conflicts:        %{name}-compiler > %{version}
-Conflicts:        %{name}-compiler < %{version}
+Conflicts:        %{pkg_name}-compiler > %{version}
+Conflicts:        %{pkg_name}-compiler < %{version}
 
 %description java
 This package contains Java Protocol Buffers runtime library.
 
 %package javadoc
-Summary: Javadocs for %{name}-java
+Summary: Javadocs for %{pkg_name}-java
 Group:   Documentation
 Requires: jpackage-utils
-Requires: %{name}-java = %{version}-%{release}
+Requires: %{pkg_name}-java = %{version}-%{release}
 
 %description javadoc
-This package contains the API documentation for %{name}-java.
+This package contains the API documentation for %{pkg_name}-java.
 
 %endif
 
 %prep
-%setup -q
+%setup -n %{pkg_name}-%{version} -q
 %if %{with gtest}
 rm -rf gtest
 %patch1 -p1 -b .gtest
@@ -202,9 +206,13 @@ iconv -f iso8859-1 -t utf-8 CONTRIBUTORS.txt > CONTRIBUTORS.txt.utf8
 mv CONTRIBUTORS.txt.utf8 CONTRIBUTORS.txt
 export PTHREAD_LIBS="-lpthread"
 ./autogen.sh
+%{?scl:scl enable %{scl} - << \EOF}
 %configure
+%{?scl:EOF}
 
+%{?scl:scl enable %{scl} - << \EOF}
 make %{?_smp_mflags}
+%{?scl:EOF}
 
 %if %{with python}
 pushd python
@@ -226,7 +234,9 @@ emacs -batch -f batch-byte-compile editors/protobuf-mode.el
 
 %install
 rm -rf %{buildroot}
+%{?scl:scl enable %{scl} - << \EOF}
 make %{?_smp_mflags} install DESTDIR=%{buildroot} STRIPBINARIES=no INSTALL="%{__install} -p" CPPROG="cp -p"
+%{?scl:EOF}
 find %{buildroot} -type f -name "*.la" -exec rm -f {} \;
 
 %if %{with python}
@@ -240,14 +250,14 @@ install -p -m 644 -D editors/proto.vim %{buildroot}%{_datadir}/vim/vimfiles/synt
 %if %{with java}
 pushd java
 install -d -m 755 %{buildroot}%{_javadir}
-install -pm 644 target/%{name}-java-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
+install -pm 644 target/%{pkg_name}-java-%{version}.jar %{buildroot}%{_javadir}/%{pkg_name}.jar
 
-install -d -m 755 %{buildroot}%{_javadocdir}/%{name}
-cp -rp target/site/apidocs %{buildroot}%{_javadocdir}/%{name}
+install -d -m 755 %{buildroot}%{_javadocdir}/%{pkg_name}
+cp -rp target/site/apidocs %{buildroot}%{_javadocdir}/%{pkg_name}
 
 install -d -m 755 %{buildroot}%{_mavenpomdir}
-install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/JPP-%{name}.pom
-%add_maven_depmap JPP-%{name}.pom %{name}.jar
+install -pm 644 pom.xml %{buildroot}%{_mavenpomdir}/JPP-%{pkg_name}.pom
+%add_maven_depmap JPP-%{pkg_name}.pom %{pkg_name}.jar
 popd
 %endif
 
@@ -306,6 +316,7 @@ install -p -m 0644 %{SOURCE2} $RPM_BUILD_ROOT%{emacs_startdir}
 %{_libdir}/libprotobuf-lite.a
 
 %if %{with python}
+
 %files python
 %defattr(-, root, root, -)
 %dir %{python_sitelib}/google
@@ -331,19 +342,23 @@ install -p -m 0644 %{SOURCE2} $RPM_BUILD_ROOT%{emacs_startdir}
 %{emacs_lispdir}/protobuf-mode.el
 
 %if %{with java}
+
 %files java
 %defattr(-, root, root, -)
-%{_mavenpomdir}/JPP-%{name}.pom
-%{_mavendepmapfragdir}/%{name}
-%{_javadir}/%{name}.jar
+%{_mavenpomdir}/JPP-%{pkg_name}.pom
+%{_mavendepmapfragdir}/%{pkg_name}
+%{_javadir}/%{pkg_name}.jar
 %doc examples/AddPerson.java examples/ListPeople.java
 
 %files javadoc
 %defattr(-, root, root, -)
-%{_javadocdir}/%{name}
+%{_javadocdir}/%{pkg_name}
 %endif
 
 %changelog
+* Fri Jul 24 2015 Joshua Hoblitt <josh@hoblitt.com> 2.4.1-13
+- new package built with tito
+
 * Tue Feb 26 2013 Conrad Meyer <cemeyer@uw.edu> - 2.4.1-12
 - Nuke BR on maven-doxia, maven-doxia-sitetools (#915620)
 
