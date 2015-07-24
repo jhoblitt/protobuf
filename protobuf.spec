@@ -18,7 +18,7 @@
 Summary:        Protocol Buffers - Google's data interchange format
 Name:           %{?scl_prefix}protobuf
 Version:        2.4.1
-Release:        15%{?dist}
+Release:        16%{?dist}
 License:        BSD
 Group:          Development/Libraries
 Source:         http://protobuf.googlecode.com/files/%{pkg_name}-%{version}.tar.bz2
@@ -33,6 +33,9 @@ BuildRequires:  emacs-el >= 24.1
 %if %{with gtest}
 BuildRequires:  gtest-devel
 %endif
+%{?scl:BuildRequires: %{scl_prefix}build %{scl_prefix}runtime}
+%{?scl:Requires: %{scl_prefix}runtime}
+
 
 %description
 Protocol Buffers are a way of encoding structured data in an efficient
@@ -117,8 +120,8 @@ lacks descriptors, reflection, and some other features.
 %package python
 Summary: Python bindings for Google Protocol Buffers
 Group: Development/Languages
-BuildRequires: %{?scl:python27-}python-devel
-BuildRequires: %{?scl:python27-}python-setuptools-devel
+BuildRequires: %{?scl_prefix_python}python-devel
+BuildRequires: %{?scl_perfix_python}python-setuptools-devel
 Conflicts: %{?scl_prefix}%{pkg_name}-compiler > %{version}
 Conflicts: %{?scl_prefix}%{pkg_name}-compiler < %{version}
 
@@ -216,7 +219,9 @@ make %{?_smp_mflags}
 
 %if %{with python}
 pushd python
-python ./setup.py build
+%{?scl:scl enable %{scl} - << \EOF}
+%{__python} setup.py build
+%{?scl:EOF}
 sed -i -e 1d build/lib/google/protobuf/descriptor_pb2.py
 popd
 %endif
@@ -241,7 +246,9 @@ find %{buildroot} -type f -name "*.la" -exec rm -f {} \;
 
 %if %{with python}
 pushd python
-python ./setup.py install --root=%{buildroot} --single-version-externally-managed --record=INSTALLED_FILES --optimize=1
+%{?scl:scl enable %{scl} - << \EOF}
+%{__python} setup.py install --root=%{buildroot} --single-version-externally-managed --record=INSTALLED_FILES --optimize=1
+%{?scl:EOF}
 popd
 %endif
 install -p -m 644 -D %{SOURCE1} %{buildroot}%{_datadir}/vim/vimfiles/ftdetect/proto.vim
@@ -356,6 +363,9 @@ install -p -m 0644 %{SOURCE2} $RPM_BUILD_ROOT%{emacs_startdir}
 %endif
 
 %changelog
+* Fri Jul 24 2015 Joshua Hoblitt <josh@hoblitt.com> 2.4.1-16
+- 
+
 * Fri Jul 24 2015 Joshua Hoblitt <josh@hoblitt.com> 2.4.1-15
 - 
 
